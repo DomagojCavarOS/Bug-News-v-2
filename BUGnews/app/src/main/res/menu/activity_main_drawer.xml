@@ -2,23 +2,27 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <group android:checkableBehavior="single">
-        <item android:id="@+id/nav_camara" android:icon="@android:drawable/ic_menu_camera"
+        <item android:id="@+id/home" android:icon="@drawable/home"
             android:title="Home" />
-        <item android:id="@+id/nav_gallery" android:icon="@android:drawable/ic_menu_gallery"
+        <item android:id="@+id/hardver" android:icon="@drawable/hardwere"
             android:title="Hardver" />
-        <item android:id="@+id/nav_slideshow" android:icon="@android:drawable/ic_menu_slideshow"
+        <item android:id="@+id/softver" android:icon="@drawable/softwere"
             android:title="Softver" />
-        <item android:id="@+id/nav_manage" android:icon="@android:drawable/ic_menu_manage"
+        <item android:id="@+id/mimapp" android:icon="@drawable/siftwere"
             android:title="Mobiteli i mobilne app" />
+        <item android:id="@+id/tig" android:icon="@drawable/tecknology"
+            android:title="Tehnologije i gadgeti" />
+        <item android:id="@+id/biznis" android:icon="@drawable/dollar"
+            android:title="Biznis" />
+        <item android:id="@+id/zabava" android:icon="@drawable/enter"
+            android:title="Zabava" />
+        <item android:id="@+id/obrazovanje" android:icon="@drawable/book"
+            android:title="Obrazovanje" />
+        <item android:id="@+id/Hakeri" android:icon="@drawable/hackers"
+            android:title="Hakeri" />
+        <item android:id="@+id/ostalo" android:icon="@drawable/box"
+            android:title="Ostalo" />
     </group>
 
-    <item android:title="Communicate">
-        <menu>
-            <item android:id="@+id/nav_share" android:icon="@android:drawable/ic_menu_share"
-                android:title="Share" />
-            <item android:id="@+id/nav_send" android:icon="@android:drawable/ic_menu_send"
-                android:title="Send" />
-        </menu>
-    </item>
 
 </menu>

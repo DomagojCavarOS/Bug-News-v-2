@@ -1,6 +1,7 @@
 package com.d42gmail.cavar.bugnews;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -15,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -43,7 +45,19 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         list= (ListView) findViewById(R.id.listView);
-        adapter=new BugAdapter(MainActivity.this,bugArray);
+
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                String Url=adapter.getItem(position).getLink();
+                Intent intent=new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse(Url));
+                startActivity(intent);
+
+
+            }
+        });
         
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 
@@ -118,6 +132,7 @@ public class MainActivity extends AppCompatActivity
                                 if (name.equals("category")) {
                                     //Log.d("TAG_Category",XmlParser.nextText());
                                     n.setCategory(XmlParser.nextText());
+
                                 }
                                 if (name.equals("description")) {
                                     //Log.d("TAG_Description",XmlParser.nextText());
@@ -130,6 +145,7 @@ public class MainActivity extends AppCompatActivity
                                 }
                                 if (name.equals("enclosure")) {
                                     //Log.d("TAG_image", XmlParser.nextText());
+                                    Log.i("i",""+n.getImageurl());
 
 
                                     n.setImageurl(XmlParser.getAttributeValue(null, "url"));
@@ -178,7 +194,7 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camara) {
+        if (id == R.id.home) {
             list.setAdapter(null);
             // Handle the camera action
                     adapter = new BugAdapter(getApplicationContext(),bugArray);
@@ -187,57 +203,102 @@ public class MainActivity extends AppCompatActivity
 
 
 
-        } else if (id == R.id.nav_gallery) {
-            list.setAdapter(null);
-            bugArray1.clear();
-            for(Bug bugara:bugArray)
-            {Log.i("ii", "" + bugara.getCategory());
-                if(bugara.getCategory().equals("Hardver")){
-                    Log.i("ii", "" + bugara.getCategory());
-                    bugArray1.add(bugara);
-                    adapter = new BugAdapter(getApplicationContext(),bugArray1);
-                    list.setAdapter(adapter);
-                    adapter.notifyDataSetChanged();
-                }
-            }
+
+        } else if (id == R.id.hardver) {
+         ucitaj("Hardver");
 
 
-        } else if (id == R.id.nav_slideshow) {
-        list.setAdapter(null);
-            bugArray1.clear();
-            for(Bug bugara:bugArray)
-            {
-                if(bugara.getCategory().equals("Softver")){
-                    Log.i("ii", "" + bugara.getCategory());
-                    bugArray1.add(bugara);
-                    adapter = new BugAdapter(getApplicationContext(),bugArray1);
-                    list.setAdapter(adapter);
-                    adapter.notifyDataSetChanged();
-                }
-            }
+        } else if (id == R.id.softver) {
+       ucitaj("Softver");
 
-        } else if (id == R.id.nav_manage) {
-            list.setAdapter(null);
-            bugArray1.clear();
-            for(Bug bugara:bugArray)
-            {
-                if(((bugara.getCategory().equals("Mobiteli")))||((bugara.getCategory().equals("Mobilne aplikacije")))){
-                    Log.i("ii", "" + bugara.getCategory());
-                    bugArray1.add(bugara);
-                    adapter = new BugAdapter(getApplicationContext(),bugArray1);
-                    list.setAdapter(adapter);
-                    adapter.notifyDataSetChanged();
-                }
-            }
+        } else if (id == R.id.mimapp) {
+         ucitaj1("Mobiteli","Mobilne aplikacije");
 
-        } else if (id == R.id.nav_share) {
+        } else if (id == R.id.tig) {
 
-        } else if (id == R.id.nav_send) {
+           ucitaj1("Tehnologije","Gadgeti");
+
+        }
+        else if (id == R.id.biznis) {
+
+            ucitaj("Biznis");
+
+        }
+        else if (id == R.id.zabava) {
+            ucitaj("Zabava");
+
+        }
+        else if (id == R.id.obrazovanje) {
+            ucitaj("Obrazovanje");
+
+        }
+        else if (id == R.id.Hakeri) {
+            ucitaj("Hakeri");
+
+        }
+        else if (id == R.id.ostalo) {
+
+            ostalo();
 
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void ostalo() {
+
+        list.setAdapter(null);
+        bugArray1.clear();
+        for(Bug bugara:bugArray)
+        {
+            if((bugara.getCategory().equals("Hakeri"))||(bugara.getCategory().equals("Obrazovanje"))||(bugara.getCategory().equals("Zabava"))||(bugara.getCategory().equals("Biznis"))||
+            (bugara.getCategory().equals("Tehnologije"))||(bugara.getCategory().equals("Gadgeti"))||(bugara.getCategory().equals("Mobiteli"))||(bugara.getCategory().equals("Mobilne aplikacije"))
+            ||(bugara.getCategory().equals("Softver"))||(bugara.getCategory().equals("Hardver"))){
+
+            }
+            else{
+            Log.i("ii", "" + bugara.getCategory());
+            bugArray1.add(bugara);
+            adapter = new BugAdapter(getApplicationContext(),bugArray1);
+            list.setAdapter(adapter);
+            adapter.notifyDataSetChanged();
+        }
+        }
+
+
+    }
+
+    private void ucitaj(String name) {
+        list.setAdapter(null);
+        bugArray1.clear();
+        for(Bug bugara:bugArray)
+        {
+            if(bugara.getCategory().equals(name)){
+                Log.i("ii", "" + bugara.getCategory());
+                bugArray1.add(bugara);
+                adapter = new BugAdapter(getApplicationContext(),bugArray1);
+                list.setAdapter(adapter);
+                adapter.notifyDataSetChanged();
+            }
+        }
+    }
+
+    private void ucitaj1(String name, String name1){
+
+        list.setAdapter(null);
+        bugArray1.clear();
+        for(Bug bugara:bugArray)
+        {
+            if(((bugara.getCategory().equals(name)))||((bugara.getCategory().equals(name1)))){
+                Log.i("ii", "" + bugara.getCategory());
+                bugArray1.add(bugara);
+                adapter = new BugAdapter(getApplicationContext(),bugArray1);
+                list.setAdapter(adapter);
+                adapter.notifyDataSetChanged();
+            }
+        }
+
     }
 }
