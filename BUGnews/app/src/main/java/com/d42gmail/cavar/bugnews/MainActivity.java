@@ -1,6 +1,9 @@
 package com.d42gmail.cavar.bugnews;
 
+import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -36,6 +39,8 @@ public class MainActivity extends AppCompatActivity
     ArrayList<Bug> bugArray;
     ArrayList<Bug> bugArray1=new ArrayList<Bug>();
     BugAdapter adapter;
+    DatabaseHelper dbHelper=new DatabaseHelper(this);
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,14 +49,33 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        list= (ListView) findViewById(R.id.listView);
+        list = (ListView) findViewById(R.id.listView);
+
+        if(internetConnection(MainActivity.this)==true) {
+            GetBugTask mt = new GetBugTask();
+            mt.execute("http://www.bug.hr/rss/vijesti/");
+        }
+        else{
+
+            bugArray=dbHelper.getResultDB();
+            adapter=new BugAdapter(MainActivity.this,bugArray);
+            for(Bug bug:bugArray)
+            {
+                Log.i(" ucitano: ", " Naslov: " + bug.getTitle() + " Opis: " + bug.getDescription() + " kategorija: " + bug.getCategory() + " Link: " + bug.getLink() + " Slika: " + bug.getImageurl());
+
+            }
+            list.setAdapter(adapter);
+            adapter.notifyDataSetChanged();
+
+
+        }
 
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                String Url=adapter.getItem(position).getLink();
-                Intent intent=new Intent(Intent.ACTION_VIEW);
+                String Url = adapter.getItem(position).getLink();
+                Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.setData(Uri.parse(Url));
                 startActivity(intent);
 
@@ -69,12 +93,6 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-
-        GetBugTask mt = new GetBugTask();
-        mt.execute("http://www.bug.hr/rss/vijesti/");
-
-
-
     }
 
     private class GetBugTask extends AsyncTask<String, Integer, ArrayList<Bug>> {
@@ -90,6 +108,12 @@ public class MainActivity extends AppCompatActivity
             adapter=new BugAdapter(MainActivity.this,bugArray);
             list.setAdapter(adapter);
             adapter.notifyDataSetChanged();
+            dbHelper.deleteDatabase(bugArray);
+
+            for(Bug bug : bugArray) {
+
+                dbHelper.addData(bug, MainActivity.this);
+            }
             Log.i("a", "radi");
 
             super.onPostExecute(result);
@@ -159,7 +183,9 @@ public class MainActivity extends AppCompatActivity
                             name = XmlParser.getName();
                             if (name.equals("item"))
                             {
+
                                 list.add(n);
+
                                 new_item=false;
                             }
                             break;
@@ -300,5 +326,9 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
+    }
+
+    public boolean internetConnection( Context context) {
+        return ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo() != null;
     }
 }

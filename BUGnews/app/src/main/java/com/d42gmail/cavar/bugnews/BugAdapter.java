@@ -30,10 +30,12 @@ public class BugAdapter extends BaseAdapter {
     ArrayList<Bug> list1;
     ImageLoader imageLoader;
     DisplayImageOptions options;
+    boolean indicator=true;
 
     public BugAdapter(Context ctx, ArrayList<Bug> list1) {
         this.ctx = ctx;
         this.list1 = list1;
+        this.indicator=indicator;
     }
 
     @Override
@@ -64,19 +66,18 @@ public class BugAdapter extends BaseAdapter {
         imageLoader.init(config);
 
         //Setup options for ImageLoader so it will handle caching for us.
-        options = new DisplayImageOptions.Builder()
-                .cacheInMemory()
-                .cacheOnDisc()
-                .build();
         ImageView image = (ImageView) convertView.findViewById(R.id.imagelist);
-        imageLoader.displayImage(current.getImageurl(),image,options);
+
+
+            options = new DisplayImageOptions.Builder()
+                    .cacheInMemory()
+                    .cacheOnDisc()
+                    .build();
+            imageLoader.displayImage(current.getImageurl(), image, options);
+
 
         TextView title = (TextView) convertView.findViewById(R.id.titlelist);
         TextView descripton= (TextView) convertView.findViewById(R.id.descriptionlist);
-
-
-
-
         title.setText("" + current.getTitle());
         descripton.setText(""+current.getDescription());
         Log.i("aa","aasd:"+current.getDescription());
