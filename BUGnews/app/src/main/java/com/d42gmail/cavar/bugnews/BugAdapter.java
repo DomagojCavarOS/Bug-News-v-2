@@ -30,12 +30,12 @@ public class BugAdapter extends BaseAdapter {
     ArrayList<Bug> list1;
     ImageLoader imageLoader;
     DisplayImageOptions options;
-    boolean indicator=true;
+
 
     public BugAdapter(Context ctx, ArrayList<Bug> list1) {
         this.ctx = ctx;
         this.list1 = list1;
-        this.indicator=indicator;
+
     }
 
     @Override

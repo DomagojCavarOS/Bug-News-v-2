@@ -1,10 +1,20 @@
 package com.d42gmail.cavar.bugnews;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+
 /**
  * Created by Enigma on 19.11.2015..
  */
 public class Bug {
     String Title, Description, Link, Category, Imageurl;
+
 
     public Bug(String title, String description, String link, String category, String imageurl) {
         Title = title;
@@ -12,15 +22,16 @@ public class Bug {
         Link = link;
         Category = category;
         Imageurl = imageurl;
+
+
     }
 
-    public Bug()
-    {
-        Title="N/A";
-        Description="N/A";
-        Link="N/A";
-        Category="N/A";
-        Imageurl= String.valueOf(R.drawable.bug);
+    public Bug() {
+        Title = "N/A";
+        Description = "N/A";
+        Link = "N/A";
+        Category = "N/A";
+        Imageurl = String.valueOf(R.drawable.bug);
     }
 
     public String getTitle() {
@@ -62,4 +73,10 @@ public class Bug {
     public void setImageurl(String imageurl) {
         Imageurl = imageurl;
     }
+
+
+
+
+
+
 }

@@ -19,8 +19,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,7 +42,6 @@ public class MainActivity extends AppCompatActivity
     ArrayList<Bug> bugArray1=new ArrayList<Bug>();
     BugAdapter adapter;
     DatabaseHelper dbHelper=new DatabaseHelper(this);
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,18 +98,98 @@ public class MainActivity extends AppCompatActivity
 
     private class GetBugTask extends AsyncTask<String, Integer, ArrayList<Bug>> {
 
+        int count=0;
+
         @Override
         protected ArrayList<Bug> doInBackground(String... params) {
             String url = params[0];
-            ArrayList<Bug> list = getDataFromWeb(url);
+            ArrayList<Bug> list=new ArrayList<Bug>();
+
+            try {
+                URL u = new URL(url);
+                HttpURLConnection connection =
+                        (HttpURLConnection) u.openConnection();
+                connection.setConnectTimeout(16000);
+                connection.setReadTimeout(10000);
+                connection.setRequestMethod("GET");
+                connection.connect();
+                InputStream input = connection.getInputStream();
+                XmlPullParserFactory XmlFactory = XmlPullParserFactory.newInstance();
+                XmlPullParser XmlParser = XmlFactory.newPullParser();
+                Bug bug = null;
+                XmlParser.setInput(input,null);
+                int eventType = XmlParser.getEventType();
+                boolean new_item = false;
+                while (eventType != XmlPullParser.END_DOCUMENT) {
+                    switch (eventType) {
+
+                        case XmlPullParser.START_TAG:
+                            String name = XmlParser.getName();
+                            if (name.equals("item")) {
+                                bug = new Bug();
+                                new_item=true;
+                                Log.i("se","item tag kreiraj novi objekt");
+                            }
+                            if(new_item==true) {
+                                if (name.equals("title")) {
+                                    bug.setTitle(XmlParser.nextText());
+                                    Log.i("se", "title tag");
+
+                                }
+                                if (name.equals("category")) {
+                                    bug.setCategory(XmlParser.nextText());
+                                    Log.i("se", "category tag");
+                                }
+                                if (name.equals("description")) {
+                                    bug.setDescription(XmlParser.nextText());
+                                    Log.i("se", "description tag");
+                                }
+
+                                if (name.equals("link")) {
+                                    bug.setLink(XmlParser.nextText());
+                                    Log.i("se", "link tag");
+                                }
+                                if (name.equals("enclosure")) {
+                                    Log.i("se","enclosure tag");
+
+
+                                    bug.setImageurl(XmlParser.getAttributeValue(null, "url"));
+
+                                }
+
+
+                            }
+                            break;
+                        case XmlPullParser.END_TAG:
+                            name = XmlParser.getName();
+                            Log.i("se","provjeri end tag");
+                            if (name.equals("item"))
+                            {
+                                list.add(bug);
+
+                                new_item=false;
+                            }
+                            break;
+                    }
+                    Log.i("se","čitaj sljedeći tag");
+                    eventType = XmlParser.next();
+                }
+                connection.disconnect();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             return list;
+
+
         }
+
         protected void onPostExecute(ArrayList<Bug> result) {
             bugArray=result;
             adapter=new BugAdapter(MainActivity.this,bugArray);
             list.setAdapter(adapter);
             adapter.notifyDataSetChanged();
             dbHelper.deleteDatabase(bugArray);
+            setProgressBarVisibility(false);
 
             for(Bug bug : bugArray) {
 
@@ -119,85 +200,7 @@ public class MainActivity extends AppCompatActivity
             super.onPostExecute(result);
         }
 
-        private ArrayList<Bug> getDataFromWeb(String url) {
-            ArrayList<Bug> list = new ArrayList<Bug>();
-            try {
-                URL u = new URL(url);
-                HttpURLConnection connection =
-                        (HttpURLConnection) u.openConnection();
-                connection.setConnectTimeout(15000);
-                connection.setReadTimeout(10000);
-                connection.setRequestMethod("GET");
-                connection.connect();
-                InputStream input = connection.getInputStream();
-                XmlPullParserFactory XmlFactory = XmlPullParserFactory.newInstance();
-                XmlPullParser XmlParser = XmlFactory.newPullParser();
-                Bug n = null;
-                XmlParser.setInput(input,null);
-                int eventType = XmlParser.getEventType();
-                boolean new_item = false;
-                while (eventType != XmlPullParser.END_DOCUMENT) {
-                    switch (eventType) {
 
-
-
-                        case XmlPullParser.START_TAG:
-                            String name = XmlParser.getName();
-                            if (name.equals("item")) {
-                                n = new Bug();
-                                new_item=true;
-                            }
-                            if(new_item) {
-                                if (name.equals("title")) {
-                                    //Log.d("TAG_Title",XmlParser.nextText());
-                                    n.setTitle(XmlParser.nextText());
-
-                                }
-                                if (name.equals("category")) {
-                                    //Log.d("TAG_Category",XmlParser.nextText());
-                                    n.setCategory(XmlParser.nextText());
-
-                                }
-                                if (name.equals("description")) {
-                                    //Log.d("TAG_Description",XmlParser.nextText());
-                                    n.setDescription(XmlParser.nextText());
-                                }
-
-                                if (name.equals("link")) {
-                                    //Log.d("TAG_link", XmlParser.nextText());
-                                    n.setLink(XmlParser.nextText());
-                                }
-                                if (name.equals("enclosure")) {
-                                    //Log.d("TAG_image", XmlParser.nextText());
-                                    Log.i("i",""+n.getImageurl());
-
-
-                                    n.setImageurl(XmlParser.getAttributeValue(null, "url"));
-
-                                }
-
-
-                            }
-                            break;
-                        case XmlPullParser.END_TAG:
-                            name = XmlParser.getName();
-                            if (name.equals("item"))
-                            {
-
-                                list.add(n);
-
-                                new_item=false;
-                            }
-                            break;
-                    }
-                    eventType = XmlParser.next();
-                }
-                connection.disconnect();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return list;
-        }
 
 
     }
